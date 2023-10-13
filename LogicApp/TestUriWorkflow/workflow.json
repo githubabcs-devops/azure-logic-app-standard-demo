@@ -1,0 +1,53 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "HTTP": {
+                "type": "Http",
+                "inputs": {
+                    "uri": "https://azure.status.microsoft/status/",
+                    "method": "GET"
+                },
+                "runAfter": {},
+                "runtimeConfiguration": {
+                    "contentTransfer": {
+                        "transferMode": "Chunked"
+                    }
+                }
+            },
+            "Compose": {
+                "type": "Compose",
+                "inputs": "@outputs('HTTP')",
+                "runAfter": {
+                    "HTTP": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "Terminate": {
+                "type": "Terminate",
+                "inputs": {
+                    "runStatus": "Succeeded"
+                },
+                "runAfter": {
+                    "Compose": [
+                        "SUCCEEDED"
+                    ]
+                }
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "triggers": {
+            "Recurrence": {
+                "type": "Recurrence",
+                "recurrence": {
+                    "interval": 1,
+                    "frequency": "Day"
+                }
+            }
+        },
+        "parameters": {}
+    },
+    "kind": "Stateful"
+}
